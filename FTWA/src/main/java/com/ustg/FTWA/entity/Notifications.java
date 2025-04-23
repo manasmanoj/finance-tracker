@@ -8,19 +8,20 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class Notifications {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    private String username;
-
     private String message;
-
     @Enumerated(EnumType.STRING)
-    private NotificationsType type;
+    private Type type;
+
+    public enum Type {
+        LIMIT_ALERT,
+        GOAL_ACHIEVED,
+        REMINDER
+    }
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -32,5 +33,12 @@ public class Notifications {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
-}
 
+    @ManyToOne
+    @JoinColumn(name = "username")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "goal_id")
+    private Goal goal;
+}

@@ -1,5 +1,7 @@
 package com.ustg.FTWA.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +9,6 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Category {
 
     @Id
@@ -19,5 +20,11 @@ public class Category {
     @Enumerated(EnumType.STRING)
     private CategoryType type;
 
-    private String username; // to scope categories to a user
+    public enum CategoryType {
+        INCOME,
+        EXPENSE
+    }
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Transaction> transactions;
 }

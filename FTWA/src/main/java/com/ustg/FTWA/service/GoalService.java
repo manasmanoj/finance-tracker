@@ -1,47 +1,43 @@
 package com.ustg.FTWA.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
+import com.ustg.FTWA.entity.Goal;
+import com.ustg.FTWA.entity.User;
+import com.ustg.FTWA.repository.GoalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ustg.FTWA.entity.Goal;
-import com.ustg.FTWA.repository.GoalRepository;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GoalService {
 
     @Autowired
-    private GoalRepository goalRepo;
+    private GoalRepository goalRepository;
 
-    public List<Goal> getUserGoals(Long userId) {
-        return goalRepo.findByUserId(userId);
+    public Goal saveGoal(Goal goal) {
+        return goalRepository.save(goal);
     }
 
-    public Goal createGoal(Goal goal) {
-        goal.setCreatedAt(LocalDate.now());
-        goal.setCurrentAmount(BigDecimal.ZERO); // initial
-        return goalRepo.save(goal);
+    public List<Goal> getGoalsByUser(User user) {
+        return goalRepository.findByUser(user);
     }
 
-    public Goal updateGoal(Long id, Goal updated) {
-        Goal goal = goalRepo.findById(id).orElseThrow();
-        goal.setTitle(updated.getTitle());
-        goal.setTargetAmount(updated.getTargetAmount());
-        if (updated.getCurrentAmount() != null) {
-            goal.setCurrentAmount(updated.getCurrentAmount());
-        }
-        goal.setDeadline(updated.getDeadline());
-        return goalRepo.save(goal);
+    public Optional<Goal> getGoalById(Long id) {
+        return goalRepository.findById(id);
     }
 
     public void deleteGoal(Long id) {
-        goalRepo.deleteById(id);
+        goalRepository.deleteById(id);
     }
-    
-    public List<Goal> getAll(){
-    	return goalRepo.findAll();
+
+    public Goal updateGoal(Long id, Goal updatedGoal) {
+        return goalRepository.findById(id).map(goal -> {
+            goal.setTitle(updatedGoal.getTitle());
+            goal.setTargetAmount(updatedGoal.getTargetAmount());
+            goal.setCurrentAmount(updatedGoal.getCurrentAmount());
+            goal.setDeadline(updatedGoal.getDeadline());
+            return goalRepository.save(goal);
+        }).orElseThrow(() -> new RuntimeException("Goal not found"));
     }
 }

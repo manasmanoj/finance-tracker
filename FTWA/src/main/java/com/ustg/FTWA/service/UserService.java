@@ -1,54 +1,45 @@
 package com.ustg.FTWA.service;
 
+import com.ustg.FTWA.entity.User;
+import com.ustg.FTWA.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.stereotype.Service;
-
-import com.ustg.FTWA.entity.User;
-import com.ustg.FTWA.repository.UserRepo;
-
 @Service
 public class UserService {
-	// @Autowired
-	// private PasswordEncoder pwe;
-
-	// public String encodePassword(String password) {
-	// return pwe.encode(password);
-
-	// }
 
 	@Autowired
-	private UserRepo userrepo;
-
-	public User save(User user) {
-		// user.setPassWord(pwe.encode(user.getPassWord()));
-		return userrepo.save(user);
-	}
-
-	public User getUserbyId(String id) {
-		return userrepo.getById(id);
-	}
+	private UserRepository userRepository;
 
 	public List<User> getAllUsers() {
-		return userrepo.findAll();
+		return userRepository.findAll();
 	}
 
-	public User Update(String id, User user) {
-		Optional<User> u = userrepo.findById(id);
-		User r = null;
-		if (u.isPresent()) {
-			User us = u.get();
-			us.setPassWord(user.getPassWord());
-			us.setMonthly_income(user.getMonthly_income());
-			return us;
-		}
-		return r;
+	public Optional<User> getUserByUsername(String username) {
+		return userRepository.findById(username);
 	}
 
-	public void deleteById(String id) {
-		userrepo.deleteById(id);
+	public User createUser(User user) {
+		return userRepository.save(user);
+	}
+
+	public User updateUser(String username, User updatedUser) {
+		return userRepository.findById(username)
+				.map(user -> {
+					user.setPassWord(updatedUser.getPassWord());
+					user.setMonthly_income(updatedUser.getMonthly_income());
+					return userRepository.save(user);
+				})
+				.orElseGet(() -> {
+					updatedUser.setUsername(username);
+					return userRepository.save(updatedUser);
+				});
+	}
+
+	public void deleteUser(String username) {
+		userRepository.deleteById(username);
 	}
 }

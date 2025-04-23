@@ -1,12 +1,21 @@
 package com.ustg.FTWA.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
 	@Id
@@ -15,43 +24,19 @@ public class User {
 	@Column(precision = 10, scale = 2)
 	private BigDecimal monthly_income;
 
-	public String getUsername() {
-		return username;
-	}
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Transaction> transactions;
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Goal> goals;
 
-	public String getPassWord() {
-		return passWord;
-	}
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Bank> bankTransactions;
 
-	public void setPassWord(String passWord) {
-		this.passWord = passWord;
-	}
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<Notifications> notifications;
 
-	public BigDecimal getMonthly_income() {
-		return monthly_income;
-	}
-
-	public void setMonthly_income(BigDecimal monthly_income) {
-		this.monthly_income = monthly_income;
-	}
-
-	public User() {
-		super();
-	}
-
-	public User(String username, String passWord, BigDecimal monthly_income) {
-		this.username = username;
-		this.passWord = passWord;
-		this.monthly_income = monthly_income;
-	}
-
-	@Override
-	public String toString() {
-		return "User [username=" + username + ", passWord=" + passWord + ", monthly_income=" + monthly_income + "]";
-	}
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<SpendLimit> spendLimits;
 
 }

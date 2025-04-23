@@ -1,55 +1,48 @@
 package com.ustg.FTWA.controller;
 
 import com.ustg.FTWA.entity.SpendLimit;
+import com.ustg.FTWA.entity.User;
+import com.ustg.FTWA.entity.Category;
 import com.ustg.FTWA.service.SpendLimitService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/spend-limits")
-
+@RequestMapping("/api/spendlimits")
 public class SpendLimitController {
-	@Autowired
+
+    @Autowired
     private SpendLimitService spendLimitService;
 
     @PostMapping
-    public ResponseEntity<SpendLimit> createSpendLimit(@RequestBody SpendLimit spendLimit) {
-        return ResponseEntity.ok(spendLimitService.saveSpendLimit(spendLimit));
+    public SpendLimit createSpendLimit(@RequestBody SpendLimit spendLimit) {
+        return spendLimitService.createSpendLimit(spendLimit);
     }
 
-    @GetMapping
-    public ResponseEntity<List<SpendLimit>> getAllSpendLimits() {
-        return ResponseEntity.ok(spendLimitService.getAllSpendLimits());
+    @GetMapping("/user/{userId}")
+    public List<SpendLimit> getSpendLimitsByUser(@PathVariable String userId) {
+        User user = new User();
+        user.setUsername(userId); // assuming String ID
+        return spendLimitService.getSpendLimitsByUser(user);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<SpendLimit> getSpendLimitById(@PathVariable Long id) {
-        return spendLimitService.getSpendLimitById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/user/{userId}/active")
+    public List<SpendLimit> getActiveSpendLimits(@PathVariable String userId) {
+        User user = new User();
+        user.setUsername(userId);
+        return spendLimitService.getActiveSpendLimits(user);
     }
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<List<SpendLimit>> getSpendLimitsByUsername(@PathVariable String username) {
-        return ResponseEntity.ok(spendLimitService.getSpendLimitsByUsername(username));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSpendLimit(@PathVariable Long id) {
-        spendLimitService.deleteSpendLimit(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<SpendLimit> updateSpendLimit(@PathVariable Long id, @RequestBody SpendLimit updatedLimit) {
-        return spendLimitService.getSpendLimitById(id)
-                .map(existingLimit -> {
-                    updatedLimit.setId(id);
-                    return ResponseEntity.ok(spendLimitService.saveSpendLimit(updatedLimit));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/user/{userId}/category/{categoryId}")
+    public List<SpendLimit> getSpendLimitsByUserAndCategory(
+            @PathVariable String userId,
+            @PathVariable Long categoryId) {
+        User user = new User();
+        user.setUsername(userId);
+        Category category = new Category();
+        category.setId(categoryId);
+        return spendLimitService.getSpendLimitsByUserAndCategory(user, category);
     }
 }

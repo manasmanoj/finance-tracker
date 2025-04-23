@@ -1,6 +1,7 @@
 package com.ustg.FTWA.controller;
 
-import com.ustg.FTWA.entity.*;
+import com.ustg.FTWA.entity.Notifications;
+import com.ustg.FTWA.entity.User;
 import com.ustg.FTWA.service.NotificationsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,24 +15,27 @@ public class NotificationsController {
     @Autowired
     private NotificationsService notificationsService;
 
+    @GetMapping("/user/{userId}/unread")
+    public List<Notifications> getUnreadNotifications(@PathVariable String userId) {
+        User user = new User();
+        user.setUsername(userId);
+        return notificationsService.getUnreadNotifications(user);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Notifications> getAllNotifications(@PathVariable String userId) {
+        User user = new User();
+        user.setUsername(userId);
+        return notificationsService.getAllNotifications(user);
+    }
+
     @PostMapping
-    public Notifications create(@RequestBody Notifications notifications ) {
-        return notificationsService.createNotifications(notifications);
-    }
-    
-    @GetMapping
-    public List<Notifications> getAll(){
-    	return notificationsService.getAll();
-    	
-    }
-    
-    @GetMapping("/{username}")
-    public List<Notifications> getByUser(@PathVariable String username) {
-        return notificationsService.getUserNotifications(username);
+    public Notifications createNotification(@RequestBody Notifications notification) {
+        return notificationsService.createNotification(notification);
     }
 
     @PutMapping("/{id}/read")
-    public void markAsRead(@PathVariable Long id) {
-        notificationsService.markAsRead(id);
+    public Notifications markAsRead(@PathVariable Long id) {
+        return notificationsService.markAsRead(id);
     }
 }

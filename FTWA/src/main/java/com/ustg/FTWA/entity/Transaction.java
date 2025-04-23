@@ -10,6 +10,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,15 +22,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Transaction {
 
+    @ManyToOne
+    @JoinColumn(name = "username")
+    private User user;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String user;
     @Column(precision = 10, scale = 2)
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
     private Type type;
-    private String category_id;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private LocalDate date;
     private String description;
 

@@ -1,50 +1,53 @@
 package com.ustg.FTWA.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.ustg.FTWA.entity.Transaction;
+import com.ustg.FTWA.entity.User;
 import com.ustg.FTWA.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/Transaction")
+@RequestMapping("/transactions")
 public class TransactionController {
 
     @Autowired
-    private TransactionService transactionServices;
+    private TransactionService transactionService;
 
-    @PostMapping
-    public Transaction add(@RequestBody Transaction transaction) {
-        return transactionServices.createTransaction(transaction);
+    @GetMapping
+    public List<Transaction> getAllTransactions() {
+        return transactionService.getAllTransactions();
     }
 
     @GetMapping("/{id}")
-    public Transaction transactionId(@PathVariable Long id) {
-        return transactionServices.getTransactionById(id);
+    public Optional<Transaction> getTransactionById(@PathVariable Long id) {
+        return transactionService.getTransactionById(id);
     }
 
-    @GetMapping
-    public List<Transaction> allTransactions() {
-        return transactionServices.getAllTransactions();
-    }
-
-    @PutMapping("/{id}")
-    public Transaction Update(@PathVariable Long id, @RequestBody Transaction transaction) {
-        return transactionServices.updateTransaction(id, transaction);
+    @PostMapping
+    public Transaction createTransaction(@RequestBody Transaction transaction) {
+        return transactionService.saveTransaction(transaction);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteByTransactionId(@PathVariable Long id) {
-        transactionServices.deleteTransaction(id);
+    public void deleteTransaction(@PathVariable Long id) {
+        transactionService.deleteTransaction(id);
     }
 
+    // Custom endpoint example: Get transactions for a user between dates
+    @GetMapping("/user/{userId}/between")
+    public List<Transaction> getTransactionsBetweenDates(
+            @PathVariable String userId,
+            @RequestParam("start") String start,
+            @RequestParam("end") String end) {
+        User user = new User();
+        user.setUsername(userId);
+        return transactionService.getTransactionsBetweenDates(
+                user,
+                LocalDate.parse(start),
+                LocalDate.parse(end));
+    }
 }
